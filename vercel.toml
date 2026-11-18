@@ -1,0 +1,8 @@
+#:schema https://openapi.vercel.sh/vercel.json
+
+# NIKA is a continuously running Telegram worker, so deploy it as a Vercel Daemon.
+[daemons.nika]
+root = "."
+entrypoint = "Dockerfile"
+command = ["python", "bot.py"]
+instances.iad1 = 1
