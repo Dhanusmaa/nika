@@ -1372,54 +1372,64 @@ async def ping_handler(event):
     except (OSError, ValueError, IndexError):
         pass
 
-    # Build a native Joy Boy status poster so no legacy TVA artwork remains.
-    canvas = Image.new("RGB", (1445, 1089), (16, 13, 18))
-    draw = ImageDraw.Draw(canvas)
-    draw.rectangle((24, 24, 1421, 1065), outline=(214, 157, 79), width=5)
-    draw.rectangle((54, 54, 1391, 1035), outline=(112, 57, 48), width=2)
-    try:
-        title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 58)
-        label_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 25)
-    except OSError:
-        title_font = label_font = ImageFont.load_default()
-    draw.text((92, 100), "NIKA • JOY BOY", font=title_font, fill=(255, 231, 177))
-    draw.text((96, 190), "WARRIOR OF LIBERATION  /  GRAND LINE SYSTEMS", font=label_font, fill=(220, 172, 115))
-    draw.line((94, 250, 1345, 250), fill=(178, 86, 57), width=4)
-    draw.text((96, 330), "DEN-DEN MUSHI // LIVE VITALS", font=label_font, fill=(255, 231, 177))
-    draw.text((96, 415), "TELEGRAM LATENCY", font=label_font, fill=(201, 181, 158))
-    draw.text((96, 475), "BOT CONNECTION", font=label_font, fill=(201, 181, 158))
-    draw.text((96, 535), "PONEGLYPH ARCHIVE", font=label_font, fill=(201, 181, 158))
-    draw.text((96, 595), "USER SESSION", font=label_font, fill=(201, 181, 158))
-    draw.text((96, 920), "THE DRUMS OF LIBERATION ARE STILL BEATING", font=label_font, fill=(220, 172, 115))
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", max(13, canvas.width // 52))
-    except OSError:
-        font = ImageFont.load_default()
+    # Use the Captain's supplied One Piece poster when installed in assets.
+    # The original artwork is preserved; only the sample status values are overlaid.
+    custom_ping_image = os.path.join(os.path.dirname(__file__), "assets", "nika_ping.png")
+    if os.path.isfile(custom_ping_image):
+        canvas = Image.open(custom_ping_image).convert("RGB")
+        draw = ImageDraw.Draw(canvas)
+        try:
+            status_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 34)
+        except OSError:
+            status_font = ImageFont.load_default()
 
-    # Draw live status values over the Joy Boy poster.
-    # Coordinates align with the live-value panel on the Joy Boy status poster.
-    scale_x = canvas.width / 1445
-    scale_y = canvas.height / 1089
-    value_x = int(1014 * scale_x)
-    value_top = [int(y * scale_y) for y in (663, 724, 784, 845)]
-    value_right = int(1275 * scale_x)
-    value_bottoms = [int(y * scale_y) for y in (695, 755, 815, 875)]
-    live_values = [
-        f"{telegram_ms if telegram_ms is not None else 'N/A'} ms",
-        "ONLINE" if telegram_ok else "DEGRADED",
-        "CONNECTED" if db_ok else "OFFLINE",
-        "AUTHORIZED" if user_ok else "OFFLINE",
-    ]
-    for y1, y2, value in zip(value_top, value_bottoms, live_values):
-        # Clear only the printed sample value; preserve the panel, dividers and status lights.
-        draw.rectangle((value_x - int(8 * scale_x), y1 - int(3 * scale_y),
-                        value_right, y2), fill=(14, 12, 10))
-        draw.text((value_x, y1), value, font=font,
-                  fill=(226, 208, 176) if value not in ("DEGRADED", "OFFLINE", "N/A ms") else (235, 102, 81))
+        live_values = [
+            f"{telegram_ms if telegram_ms is not None else 'N/A'} ms",
+            "CONNECTED" if db_ok else "OFFLINE",
+            "ONLINE" if user_ok else "OFFLINE",
+        ]
+        # Right-hand status value areas in the supplied 1536x1024 artwork.
+        rows = [(1184, 557, 1374, 627), (1180, 654, 1374, 725), (1180, 741, 1374, 812)]
+        for (x1, y1, x2, y2), value in zip(rows, live_values):
+            draw.rounded_rectangle((x1, y1, x2, y2), radius=12, fill=(31, 22, 14))
+            bbox = draw.textbbox((0, 0), value, font=status_font)
+            text_w, text_h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+            draw.text((x1 + (x2 - x1 - text_w) // 2,
+                       y1 + (y2 - y1 - text_h) // 2 - bbox[1]),
+                      value, font=status_font,
+                      fill=(143, 255, 100) if value not in ("OFFLINE", "N/A ms") else (255, 105, 85))
+    else:
+        # Safe fallback until assets/nika_ping.png is added to the repository.
+        canvas = Image.new("RGB", (1445, 1089), (16, 13, 18))
+        draw = ImageDraw.Draw(canvas)
+        draw.rectangle((24, 24, 1421, 1065), outline=(214, 157, 79), width=5)
+        draw.rectangle((54, 54, 1391, 1035), outline=(112, 57, 48), width=2)
+        try:
+            title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 58)
+            label_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 25)
+            value_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 31)
+        except OSError:
+            title_font = label_font = value_font = ImageFont.load_default()
+        draw.text((92, 100), "NIKA • JOY BOY", font=title_font, fill=(255, 231, 177))
+        draw.text((96, 190), "WARRIOR OF LIBERATION  /  GRAND LINE SYSTEMS", font=label_font, fill=(220, 172, 115))
+        draw.line((94, 250, 1345, 250), fill=(178, 86, 57), width=4)
+        draw.text((96, 330), "DEN-DEN MUSHI // LIVE VITALS", font=label_font, fill=(255, 231, 177))
+        values = [
+            ("TELEGRAM LATENCY", f"{telegram_ms if telegram_ms is not None else 'N/A'} ms"),
+            ("BOT CONNECTION", "ONLINE" if telegram_ok else "DEGRADED"),
+            ("PONEGLYPH ARCHIVE", "CONNECTED" if db_ok else "OFFLINE"),
+            ("USER SESSION", "AUTHORIZED" if user_ok else "OFFLINE"),
+        ]
+        for index, (label, value) in enumerate(values):
+            y = 415 + index * 100
+            draw.text((96, y), label, font=label_font, fill=(201, 181, 158))
+            draw.text((850, y), value, font=value_font,
+                      fill=(226, 208, 176) if value not in ("DEGRADED", "OFFLINE", "N/A ms") else (235, 102, 81))
+        draw.text((96, 920), "THE DRUMS OF LIBERATION ARE STILL BEATING", font=label_font, fill=(220, 172, 115))
     output = io.BytesIO()
     canvas.save(output, format="JPEG", quality=90, optimize=True)
     output.seek(0)
-    output.name = "nika_joyboy_ping.jpg"
+    output.name = "nika_ping_status.jpg"
     health = "HEALTHY" if telegram_ok and db_ok and user_ok else "DEGRADED"
     caption = (
         "☀️ NIKA // LIVE VITALS\n"
