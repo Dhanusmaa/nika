@@ -1204,7 +1204,12 @@ async def app_handler(event):
         await event.reply("⚠️ App link is not configured. Set WEBAPP_URL in the deployment environment.")
         return
     # Use Telegram's direct Mini App launch link, not a plain website URL.
-    mini_app_link = "https://t.me/LokiTVA_Bot?startapp=dashboard"
+    bot_identity = await bot_client.get_me()
+    bot_username = getattr(bot_identity, "username", None)
+    if not bot_username:
+        await event.reply("⚠️ Set a public username for this bot in BotFather before opening the Mini App.")
+        return
+    mini_app_link = f"https://t.me/{bot_username}?startapp=dashboard"
     await event.reply(
         "🕰️ ☀️ NIKA • MINI DEN-DEN MUSHI\nTap below to open the Mini App inside Telegram:",
         buttons=[[Button.url("▣ OPEN NIKA MINI APP", mini_app_link)]],
@@ -3198,7 +3203,7 @@ async def health_server():
             status_code = 200
             status_text = "OK"
             if path == "/health":
-                body = b'{"status":"ok","service":"loki-tva"}'
+                body = b'{"status":"ok","service":"nika-joyboy"}'
                 content_type = b"application/json"
             elif path == "/api/ping":
                 started = time.perf_counter()
