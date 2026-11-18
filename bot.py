@@ -2971,10 +2971,24 @@ async def process_source_alert(message):
         if message.id in processed_rain_alert_ids:
             return
         processed_rain_alert_ids.add(message.id)
-        try:
-            await notify_approved_users(message, event_type)
-        except Exception as e:
-            print(f"[APPROVED] RAIN notification dispatch error | source={message.chat_id} | message={message.id} | {type(e).__name__}: {e}")
+
+        # Tell the owner immediately; the Telegram Grab-button operation can
+        # take several network round trips and must not delay the alert.
+        fast_notice = await bot_client.send_message(
+            OWNER_ID,
+            f"🌧️ NIKA // NEW RAIN DETECTED\n"
+            f"Checking Grab status…\n"
+            f"Source: {get_message_link(message)}",
+            link_preview=False,
+        )
+
+        async def dispatch_rain_notice():
+            try:
+                await notify_approved_users(message, event_type)
+            except Exception as e:
+                print(f"[APPROVED] RAIN notification dispatch error | source={message.chat_id} | message={message.id} | {type(e).__name__}: {e}")
+        asyncio.create_task(dispatch_rain_notice())
+
         source_chat_id = int(message.chat_id)
         status, response_text = await click_rain_grab(source_chat_id, message.id)
         if status == "activity_required":
