@@ -4,9 +4,9 @@ Telegram bot that monitors a configured source chat for POT / GUESS messages and
 
 ## Deploy to Koyeb
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&builder=buildpack&repository=github.com/Dhanusmaa/mazepot&branch=main&name=nika-joyboy&service_type=web&ports=8000%3Bhttp%3B%2F&run_command=python%20bot.py&env%5BPORT%5D=8000&env%5BAPI_ID%5D=&env%5BAPI_HASH%5D=&env%5BBOT_TOKEN%5D=&env%5BTELETHON_SESSION%5D=&env%5BSOURCE_CHAT_ID%5D=-1003707950453&env%5BGUESS_USER_ID%5D=8790267038&env%5BSOURCE_USERNAME%5D=maze&env%5BOWNER_ID%5D=5250696460)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&builder=buildpack&repository=github.com/Dhanusmaa/nika&branch=main&name=nika-joyboy&service_type=web&ports=8000%3Bhttp%3B%2F&run_command=python%20bot.py&env%5BPORT%5D=8000&env%5BAPI_ID%5D=&env%5BAPI_HASH%5D=&env%5BBOT_TOKEN%5D=&env%5BTELETHON_SESSION%5D=&env%5BSOURCE_CHAT_ID%5D=-1003707950453&env%5BGUESS_USER_ID%5D=8790267038&env%5BSOURCE_USERNAME%5D=maze&env%5BOWNER_ID%5D=5250696460)
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Dhanusmaa/mazepot)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Dhanusmaa/nika)
 
 > **Private repository:** Koyeb must have access to this GitHub repository before deployment.
 >
