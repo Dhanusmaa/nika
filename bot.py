@@ -1178,7 +1178,7 @@ async def get_target_user_id(event):
 def make_tva_start_image():
     """Build a TVA case-file image as a safe fallback when no custom asset is installed."""
     from PIL import Image, ImageDraw, ImageFont
-    image = Image.new("RGB", (1000, 420), (33, 31, 21))
+    image = Image.new("RGB", (1000, 420), (24, 15, 21))
     draw = ImageDraw.Draw(image)
     try:
         title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 46)
@@ -1186,13 +1186,13 @@ def make_tva_start_image():
         small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 18)
     except OSError:
         title_font = main_font = small_font = ImageFont.load_default()
-    draw.rectangle((14, 14, 986, 406), fill=(220, 199, 145), outline=(29, 27, 19), width=8)
-    draw.rectangle((32, 32, 968, 388), outline=(89, 72, 42), width=2)
+    draw.rectangle((14, 14, 986, 406), fill=(255, 231, 190), outline=(112, 57, 48), width=8)
+    draw.rectangle((32, 32, 968, 388), outline=(214, 157, 79), width=2)
     draw.text((55, 45), "THE GRAND LINE", font=small_font, fill=(67, 56, 34))
     draw.text((55, 91), "WARRIOR OF LIBERATION", font=title_font, fill=(35, 32, 23))
     draw.line((55, 158, 945, 158), fill=(82, 67, 40), width=3)
-    draw.text((58, 190), "VARIANT: NIKA • JOY BOY", font=main_font, fill=(39, 35, 25))
-    draw.text((58, 238), "STATUS: DRUMS BEATING", font=small_font, fill=(55, 73, 39))
+    draw.text((58, 190), "IDENTITY: SUN GOD NIKA", font=main_font, fill=(39, 35, 25))
+    draw.text((58, 238), "STATUS: DRUMS BEATING", font=small_font, fill=(145, 91, 49))
     draw.text((58, 279), "POT / GUESS / RAIN • GRAND LINE WATCH", font=small_font, fill=(39, 35, 25))
     draw.text((58, 340), "WELCOME ABOARD. CHOOSE YOUR COURSE.", font=small_font, fill=(75, 60, 35))
     return image
