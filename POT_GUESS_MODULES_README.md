@@ -3,7 +3,7 @@
 Files:
 - `pot_system.py`: POT number selection and optional live winning-range calibration.
 - `guess_system.py`: historical GUESS selection and live crowd-aware selection.
-- `bestpick_engine.py`: shared engine dependency from the LOKI/Mazepot repository.
+- `bestpick_engine.py`: shared prediction engine used by the Nika • Joy Boy bot.
 
 Copy all three Python files into the same folder in the destination bot.
 
