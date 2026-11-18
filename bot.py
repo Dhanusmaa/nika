@@ -2808,16 +2808,40 @@ async def process_source_alert(message):
             print(f"[RESULT] Handler error for source message {message.id}: {e}")
         return
 
-    # Don't re-alert if Telegram emits an edit/update for the same source post.
-    if event_type in ("POT", "GUESS") and await asyncio.to_thread(get_saved_prediction, event_type, message.id, int(message.chat_id)):
-        return
-
-    # Deliver source notifications to approved users independently of prediction generation.
+    # Send the owner a fast receipt immediately. Prediction/database work must
+    # never delay the first notification for a new POT/GUESS round.
     if event_type in ("POT", "GUESS"):
-        try:
-            await notify_approved_users(message, event_type)
-        except Exception as e:
-            print(f"[APPROVED] {event_type} notification dispatch error | source={message.chat_id} | message={message.id} | {type(e).__name__}: {e}")
+        alert_key = (int(message.chat_id), int(message.id), event_type)
+        if alert_key in fast_alert_keys:
+            return
+        fast_alert_keys.add(alert_key)
+        fast_notice = await bot_client.send_message(
+            OWNER_ID,
+            f"⚡ NIKA // {event_type} DETECTED\n"
+            f"Preparing prediction…\n"
+            f"Source: {get_message_link(message)}",
+            link_preview=False,
+        )
+
+        # Keep persistent duplicate protection, but do not block the event loop.
+        saved_existing = await asyncio.to_thread(
+            get_saved_prediction, event_type, message.id, int(message.chat_id)
+        )
+        if saved_existing:
+            try:
+                await fast_notice.delete()
+            except Exception:
+                pass
+            return
+
+        # Approved-user DMs run independently so a slow recipient cannot delay
+        # the owner's prediction or the source monitor.
+        async def dispatch_approved_notice():
+            try:
+                await notify_approved_users(message, event_type)
+            except Exception as e:
+                print(f"[APPROVED] {event_type} notification dispatch error | source={message.chat_id} | message={message.id} | {type(e).__name__}: {e}")
+        asyncio.create_task(dispatch_approved_notice())
 
     if event_type in ("POT", "GUESS"):
         alert_started_at = time.perf_counter()
@@ -2881,6 +2905,16 @@ async def process_source_alert(message):
         except Exception as e:
             print(f"[{event_type}] Failed to prepare prediction for source message {message.id}: {e}")
             record_incident(event_type, e, "error")
+            if fast_notice:
+                try:
+                    await fast_notice.edit(
+                        f"⚠️ NIKA // {event_type} PREDICTION FAILED\n"
+                        f"{type(e).__name__}: {str(e)[:250]}\n"
+                        f"Source: {get_message_link(message)}",
+                        link_preview=False,
+                    )
+                except Exception:
+                    pass
         return
 
     if event_type == "FLAG":
