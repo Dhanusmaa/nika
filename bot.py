@@ -3363,7 +3363,7 @@ async def health_server():
                 body = html.encode("utf-8")
                 content_type = b"text/html; charset=utf-8"
             else:
-                body = b"NIKA • JOY BOY temporal services are operational."
+                body = "NIKA • JOY BOY temporal services are operational.".encode("utf-8")
                 content_type = b"text/plain; charset=utf-8"
 
             response = (
