@@ -1110,13 +1110,13 @@ def format_rain_alert(raw_text, source_link, bot_reply="Processing rain claim...
     reply = clean_text(bot_reply or "No Telegram response received.")
     successful = str(status).casefold() in {"grab clicked", "grab successful", "success"}
     if successful:
-        result_line = "⚡ LOKI successfully activated the Grab protocol."
+        result_line = "⚡ NIKA has activated the Grab protocol! ☀️"
         status_line = "✅ GRAB SUCCESSFUL"
     elif str(status).casefold() in {"waiting for chat activity", "activity required"}:
-        result_line = "⏳ LOKI is waiting for the required recent chat activity before retrying Grab."
+        result_line = "⏳ NIKA awaits the crew's next move before retrying Grab."
         status_line = "🟡 WAITING FOR CHAT ACTIVITY"
     else:
-        result_line = f"⚙️ LOKI is processing the Grab protocol.\n{reply}"
+        result_line = f"⚙️ NIKA is working the Grab protocol.\n{reply}"
         status_line = f"🟡 STATUS: {status}"
 
     lines = [
@@ -1207,7 +1207,7 @@ async def app_handler(event):
     mini_app_link = "https://t.me/LokiTVA_Bot?startapp=dashboard"
     await event.reply(
         "🕰️ ☀️ NIKA • MINI DEN-DEN MUSHI\nTap below to open the Mini App inside Telegram:",
-        buttons=[[Button.url("▣ OPEN LOKI MINI APP", mini_app_link)]],
+        buttons=[[Button.url("▣ OPEN NIKA MINI APP", mini_app_link)]],
         link_preview=False,
     )
 
@@ -1219,7 +1219,7 @@ def help_section_text(section="core"):
             "/help — Open this command menu\n"
             "/status — System, database and HUNT status\n"
             "/ping — Telegram/DB diagnostics\n"
-            "/app — Open the TVA dashboard\n"
+            "/app — Open the Grand Line dashboard\n"
             "/speed — Processing timings\n"
             "/livegames — Current game and round status\n"
             "/stickerpack [link/name] — View or change the RAIN/reply sticker pack\n"
@@ -1367,20 +1367,31 @@ async def ping_handler(event):
     except (OSError, ValueError, IndexError):
         pass
 
-    image_path = os.path.join(os.path.dirname(__file__), "assets", "tva_ping.jpg")
-    if not os.path.isfile(image_path):
-        await event.reply(caption)
-        return
-
-    with Image.open(image_path) as source:
-        canvas = source.convert("RGB")
+    # Build a native Joy Boy status poster so no legacy TVA artwork remains.
+    canvas = Image.new("RGB", (1445, 1089), (16, 13, 18))
     draw = ImageDraw.Draw(canvas)
+    draw.rectangle((24, 24, 1421, 1065), outline=(214, 157, 79), width=5)
+    draw.rectangle((54, 54, 1391, 1035), outline=(112, 57, 48), width=2)
+    try:
+        title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 58)
+        label_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 25)
+    except OSError:
+        title_font = label_font = ImageFont.load_default()
+    draw.text((92, 100), "NIKA • JOY BOY", font=title_font, fill=(255, 231, 177))
+    draw.text((96, 190), "WARRIOR OF LIBERATION  /  GRAND LINE SYSTEMS", font=label_font, fill=(220, 172, 115))
+    draw.line((94, 250, 1345, 250), fill=(178, 86, 57), width=4)
+    draw.text((96, 330), "DEN-DEN MUSHI // LIVE VITALS", font=label_font, fill=(255, 231, 177))
+    draw.text((96, 415), "TELEGRAM LATENCY", font=label_font, fill=(201, 181, 158))
+    draw.text((96, 475), "BOT CONNECTION", font=label_font, fill=(201, 181, 158))
+    draw.text((96, 535), "PONEGLYPH ARCHIVE", font=label_font, fill=(201, 181, 158))
+    draw.text((96, 595), "USER SESSION", font=label_font, fill=(201, 181, 158))
+    draw.text((96, 920), "THE DRUMS OF LIBERATION ARE STILL BEATING", font=label_font, fill=(220, 172, 115))
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", max(13, canvas.width // 52))
     except OSError:
         font = ImageFont.load_default()
 
-    # Keep the supplied TVA/Loki poster untouched except for the four live values.
+    # Draw live status values over the Joy Boy poster.
     # Coordinates are proportional to the reference poster's right-side TIMEPAD panel.
     scale_x = canvas.width / 1445
     scale_y = canvas.height / 1089
@@ -1759,7 +1770,7 @@ def hunt_panel_text():
     window_state = "ACTIVE NOW" if hunt_schedule_active else "WAITING"
     auto_state = "🟢 ACTIVE" if hunt_enabled else "🔴 INACTIVE"
     return (
-        "🕰️ LOKI • TVA HUNT CONTROL\n"
+        "🕰️ ☀️ NIKA • HUNT CONTROL\n"
         "━━━━━━━━━━━━━━━━━━━━\n"
         f"🇮🇳 INDIA TIME: {current} IST\n\n"
         "⚡ MANUAL MODE\n"
@@ -2027,7 +2038,7 @@ async def hunt_timer_handler(event):
         if hunt_timer_enabled:
             state = "ARMED" if hunt_schedule_armed else "DISARMED"
             await event.reply(
-                "⏰ LOKI • TVA HUNT SCHEDULE\n"
+                "⏰ ☀️ NIKA • HUNT SCHEDULE\n"
                 f"🟢 HUNT START: {format_hunt_clock(hunt_timer_start_minute)} IST\n"
                 f"🛑 HUNT STOP: {format_hunt_clock(hunt_timer_end_minute)} IST\n"
                 f"⚙️ Schedule: {state}\n"
@@ -2080,7 +2091,7 @@ async def hunt_timer_handler(event):
         refresh_effective_hunt_state()
         state_text = f"Scheduled HUNT will turn ON at {format_hunt_clock(start_minute)} IST."
     await event.reply(
-        "✅ LOKI • TVA DAILY HUNT WINDOW SET\n"
+        "✅ ☀️ NIKA • DAILY HUNT WINDOW SET\n"
         f"🟢 START: {format_hunt_clock(start_minute)} IST\n"
         f"🛑 STOP: {format_hunt_clock(end_minute)} IST\n"
         f"🕒 CURRENT IST: {current_ist}\n"
@@ -2104,13 +2115,13 @@ async def hunt_timer_worker():
         refresh_effective_hunt_state()
         if should_run:
             message = (
-                "🟢 LOKI • DAILY HUNT STARTED\n"
+                "🟢 ☀️ NIKA • DAILY HUNT STARTED\n"
                 "Timer window is active. POT/GUESS auto-submit is ON."
             )
             print("[HUNT TIMER] Scheduled window started.")
         else:
             message = (
-                "🛑 LOKI • DAILY HUNT STOPPED\n"
+                "🛑 ☀️ NIKA • DAILY HUNT STOPPED\n"
                 "Timer window ended. Manual HUNT remains independent.\n"
                 f"Effective auto-submit: {'ON' if hunt_enabled else 'OFF'}."
             )
@@ -2420,12 +2431,12 @@ async def rain_retry_worker():
                         if source_message:
                             updated_text = format_rain_alert(
                                 source_message.raw_text or "", get_message_link(source_message),
-                                bot_reply="The activity check cleared. LOKI clicked Grab."
+                                bot_reply="The activity check cleared. NIKA clicked Grab."
                                 + (f" Telegram replied: {response_text[:180]}" if response_text else ""),
                                 status="Grab clicked",
                             )
                         else:
-                            updated_text = f"🌧️ RAIN JOINED\nLOKI clicked Grab for source post #{message_id}.\n\n☀️ NIKA • WARRIOR OF LIBERATION"
+                            updated_text = f"🌧️ RAIN JOINED\nNIKA clicked Grab for source post #{message_id}.\n\n☀️ NIKA • WARRIOR OF LIBERATION"
                         await bot_client.edit_message(OWNER_ID, owner_message_id, updated_text)
                     print(f"[RAIN] Automatic retry succeeded | source_chat={source_chat_id} | source_message={message_id}")
                 else:
@@ -2461,12 +2472,12 @@ async def retry_pending_rains_after_owner_activity(message):
                     if source_message:
                         updated_text = format_rain_alert(
                             source_message.raw_text or "", get_message_link(source_message),
-                            bot_reply="Your recent group activity was detected. LOKI clicked Grab."
+                            bot_reply="Your recent group activity was detected. NIKA clicked Grab."
                             + (f" Telegram replied: {response_text[:180]}" if response_text else ""),
                             status="Grab clicked",
                         )
                     else:
-                        updated_text = f"🌧️ RAIN JOINED\\nLOKI clicked Grab for source post #{key[1]}.\\n\\n☀️ NIKA • WARRIOR OF LIBERATION"
+                        updated_text = f"🌧️ RAIN JOINED\\nNIKA clicked Grab for source post #{key[1]}.\\n\\n☀️ NIKA • WARRIOR OF LIBERATION"
                     await bot_client.edit_message(OWNER_ID, owner_message_id, updated_text, buttons=None)
                 print(f"[RAIN] Grab succeeded immediately after genuine owner activity | source_message={key[1]}")
             elif status != "activity_required":
@@ -2490,7 +2501,7 @@ async def prompt_owner_for_rain_activity_after_delay(key, owner_message_id):
             "🌧️ RAIN STILL WAITING · CHAT ACTIVITY REQUIRED\n\n"
             "Telegram has not accepted the account's recent activity for this RAIN. "
             "Please open the source group and send a normal message yourself. "
-            "LOKI will retry Grab automatically after your message. "
+            "NIKA will retry Grab automatically after your message. "
             "A short message such as Hi/Hello can be deleted after 1 minute.",
             buttons=[[
                 Button.url("📂 OPEN GROUP", f"https://t.me/{SOURCE_USERNAMES.get(key[0], SOURCE_USERNAME)}"),
@@ -2594,7 +2605,7 @@ async def attempt_rain_grab(event, source_chat_id, message_id):
         await event.edit(
             f"🌧️ CHAT ACTIVITY REQUIRED · #{message_id}\n"
             "Telegram requires genuine recent activity from your account. Send a normal message in the source group, "
-            "then tap RETRY JOIN below. LOKI also keeps retrying automatically.",
+            "then tap RETRY JOIN below. NIKA also keeps retrying automatically.",
             buttons=Button.inline("🔄 RETRY JOIN", data=f"rain_retry:{source_chat_id}:{message_id}".encode()),
         )
         await event.answer("Send a message in the group first, then tap JOIN RAIN.", alert=True)
@@ -2908,14 +2919,14 @@ async def process_source_alert(message):
         source_chat_id = int(message.chat_id)
         status, response_text = await click_rain_grab(source_chat_id, message.id)
         if status == "activity_required":
-            bot_reply = "Telegram requires genuine recent activity from your account in this group. Open the group and send a normal message; LOKI will keep retrying. You can also tap RETRY GRAB after sending it."
+            bot_reply = "Telegram requires genuine recent activity from your account in this group. Open the group and send a normal message; NIKA will keep retrying. You can also tap RETRY GRAB after sending it."
             status_text = "Waiting for chat activity"
             owner_buttons = [[
                 Button.url("📂 OPEN GROUP", f"https://t.me/{SOURCE_USERNAMES.get(source_chat_id, SOURCE_USERNAME)}"),
                 Button.inline("🔄 RETRY GRAB", data=f"rain_retry:{source_chat_id}:{message.id}".encode()),
             ]]
         elif status == "clicked":
-            bot_reply = "LOKI clicked the Grab button." + (f" Telegram replied: {response_text[:180]}" if response_text else "")
+            bot_reply = "NIKA clicked the Grab button." + (f" Telegram replied: {response_text[:180]}" if response_text else "")
             status_text = "Grab clicked"
             owner_buttons = None
         else:
@@ -3342,7 +3353,7 @@ async def health_server():
                     "<p>Last 4 completed result posts per game · times in UTC</p>"
                     "<section><h2>POT</h2>" + render_results(pot_logs) +
                     "</section><section><h2>GUESS</h2>" + render_results(guess_logs) +
-                    "</section><footer>TVA // TEMPORAL RECORDS · VARIANT ARCHIVE</footer></body></html>"
+                    "</section><footer>☀️ NIKA // JOY BOY'S LOGBOOK</footer></body></html>"
                 )
                 body = html.encode("utf-8")
                 content_type = b"text/html; charset=utf-8"
