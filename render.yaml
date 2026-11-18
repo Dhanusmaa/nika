@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: mazepot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    autoDeployTrigger: off
+    envVars:
+      - key: API_ID
+        sync: false
+      - key: API_HASH
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: TELETHON_SESSION
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: SOURCE_CHAT_ID
+        value: "-1003707950453"
+      - key: SOURCE_USERNAME
+        value: "mazes"
+      - key: OWNER_ID
+        value: "5250696460"
+      - key: PORT
+        value: "8000"

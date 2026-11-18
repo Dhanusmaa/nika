@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080914">
+<title>LOKI (TVA) // Timepad · Speed Lab</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#11140e;--panel:#1c2118;--line:#414c32;--cyan:#c5d99a;--blue:#82995b;--green:#c7d36f;--muted:#a8b18d;--white:#e5e8d0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#303a25 0%,#1b2117 43%,var(--bg) 78%);color:var(--white);font:14px/1.4 Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh;padding:22px 16px calc(24px + env(safe-area-inset-bottom));overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;background-image:linear-gradient(#b2aa8322 1px,transparent 1px),linear-gradient(90deg,#b2aa8322 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(to bottom,#000,transparent 85%)}
+.wrap{max-width:540px;margin:auto;position:relative}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.brand{font-weight:900;letter-spacing:2px;font-size:17px}.brand span{color:var(--cyan)}.sub{font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:3px}.live{border:1px solid #53633c;background:#252d1c;color:var(--green);padding:6px 10px;border-radius:30px;font-size:11px;display:flex;gap:6px;align-items:center}.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:pulse 1.6s infinite}
+.card{background:linear-gradient(145deg,#22291ce8,#171b13f2);border:1px solid #414c32;border-radius:18px;box-shadow:0 20px 60px #0007,inset 0 1px #ffffff0d;overflow:hidden}.hero{padding:22px 18px 18px;text-align:center}.eyebrow{color:var(--muted);font-size:10px;letter-spacing:2.5px;font-weight:700}.ringbox{width:218px;height:218px;margin:14px auto 8px;position:relative;display:grid;place-items:center}.ring{position:absolute;inset:8px;border-radius:50%;background:conic-gradient(from -90deg,var(--cyan) 0%,var(--blue) var(--progress,0%),#303a27 var(--progress,0%),#303a27 100%);padding:7px;box-shadow:0 0 30px #94b36a2b}.ring:before{content:"";display:block;width:100%;height:100%;border-radius:50%;background:#151a12;border:1px solid #ffffff0b}.ring:after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1px solid #c5d99a27;animation:orbit 8s linear infinite}.ringinner{position:relative;z-index:1}.percent{font-size:52px;line-height:1;font-weight:850;letter-spacing:-2px}.percent small{font-size:16px;color:var(--cyan);letter-spacing:0}.caption{font-size:11px;color:var(--muted);margin-top:8px}.latency{font-size:15px;font-weight:700;color:var(--cyan);margin-top:14px}.latency strong{font-size:26px;color:var(--white);letter-spacing:-1px}.statusline{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--green);font-size:12px;margin-top:7px}.actions{display:flex;gap:10px;margin-top:20px}.btn{border:1px solid #3c477e;border-radius:14px;padding:13px 10px;flex:1;color:var(--white);background:#2a3322;font-weight:750;letter-spacing:.4px;cursor:pointer}.btn.primary{background:linear-gradient(100deg,#617c42,#394d2c);border-color:#9eb878;box-shadow:0 8px 24px #617c4238}.btn:active{transform:scale(.985)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.stat{padding:15px;border-radius:18px;background:#1c2118d9;border:1px solid var(--line)}.label{font-size:10px;letter-spacing:1.5px;color:var(--muted);font-weight:750}.value{font-size:18px;font-weight:800;margin-top:7px}.value.good{color:var(--green)}.value.cyan{color:var(--cyan)}.mini{font-size:11px;color:var(--muted);margin-top:4px}.chartcard{margin-top:12px;padding:16px;border-radius:18px;background:#1c2118d9;border:1px solid var(--line)}.charthead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.charthead b{font-size:11px;letter-spacing:1.5px}.charthead span{font-size:10px;color:var(--muted)}canvas{width:100%;height:82px;display:block}.speedgrid{display:grid;gap:8px}.speedrow{display:flex;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#151a12}.speedrow b{white-space:nowrap}.speedrow span{text-align:right;color:var(--cyan);font-size:12px}.controlbtn{border:1px solid #718b50;border-radius:10px;background:#2b3921;color:var(--white);padding:8px 12px;font-weight:800;font-size:10px;letter-spacing:.7px;cursor:pointer;min-width:86px}.controlbtn.off{border-color:#795b46;background:#38291f}.controlbtn:disabled{opacity:.4;cursor:not-allowed}.controlhint{font-size:11px;color:var(--muted);margin:10px 0}.controlhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#151a12;margin-bottom:9px}.controlhead b{font-size:12px}.controlhead small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.modulegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.module{display:flex;flex-direction:column;gap:7px;padding:14px;border:1px solid var(--line);border-radius:13px;background:#151a12;color:var(--white);text-decoration:none}.module b{font-size:12px}.module span{font-size:11px;color:var(--muted)}
+.bottomnav.bottomnav{position:fixed;z-index:50;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(540px,calc(100% - 24px));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:8px;background:rgba(16,20,15,.94);border:1px solid #53633c;border-radius:24px;box-shadow:0 10px 35px #000b,inset 0 1px #ffffff14;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}.navitem{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:58px;padding:8px 2px;border:0;border-radius:12px;background:transparent;color:#a8b18d;font:600 10px/1.1 Inter,system-ui,sans-serif;text-decoration:none;cursor:pointer}.navitem .navicon{font-size:20px;line-height:1}.navitem span:last-child{font-size:10px;letter-spacing:.35px}.chartcard,section[id]{scroll-margin-top:16px}.navitem.active{background:#3b4c2c;color:#e5e8d0;box-shadow:inset 0 0 0 1px #8ba768}.navitem:active{transform:scale(.96)}body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}.foot{text-align:center;color:#929c78;font-size:10px;letter-spacing:1.5px;margin-top:17px}.foot b{color:var(--cyan);font-weight:800}
+@keyframes pulse{50%{opacity:.35;box-shadow:0 0 3px var(--green)}}@keyframes orbit{to{transform:rotate(360deg)}}@media(max-width:360px){.ringbox{width:190px;height:190px}.percent{font-size:45px}.brand{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="top">
+  <header class="top"><div><div class="brand">LOKI <span>(TVA)</span></div><div class="sub">TEMPORAL AUTHORITY · TIMEPAD · v2</div></div><div class="live"><i class="dot"></i><span id="liveLabel">LIVE</span></div></header>
+  <section class="card hero">
+    <div class="eyebrow">TVA TIMEPAD // SYSTEM DIAGNOSTICS</div>
+    <div class="ringbox"><div class="ring" id="ring"></div><div class="ringinner"><div class="percent" id="percent">--<small>%</small></div><div class="caption" id="ringCaption">Waiting for test</div><div class="latency"><strong id="latency">--</strong> ms</div><div class="statusline"><i class="dot"></i><span id="connection">Checking connection</span></div></div></div>
+    <div class="actions"><button class="btn primary" id="testBtn">↻ RUN PING</button><button class="btn" id="refreshBtn">↻ REFRESH</button></div>
+  </section>
+  <section class="chartcard" id="speedLab">
+    <div class="charthead"><b>⚡ SPEED LAB</b><span id="speedUpdated">Waiting for events</span></div>
+    <div class="speedgrid">
+      <div class="speedrow"><b>🏳️ FLAG</b><span id="speedFLAG">Waiting for first event</span></div>
+      <div class="speedrow"><b>🌧️ RAIN</b><span id="speedRAIN">Waiting for first event</span></div>
+      <div class="speedrow"><b>🪙 POT</b><span id="speedPOT">Waiting for first event</span></div>
+      <div class="speedrow"><b>🎯 GUESS</b><span id="speedGUESS">Waiting for first event</span></div>
+    </div>
+    <div class="mini">Last / average / max handler time · in-memory metrics reset on restart</div>
+  </section>
+  <div class="grid">
+    <div class="stat"><div class="label">AGENT SYSTEM</div><div class="value good" id="botStatus">CHECKING</div><div class="mini">Telegram session</div></div>
+    <div class="stat"><div class="label">ARCHIVE DATABASE</div><div class="value" id="dbStatus">CHECKING</div><div class="mini">MongoDB connectivity</div></div>
+    <div class="stat"><div class="label">FIELD SESSION</div><div class="value" id="userStatus">CHECKING</div><div class="mini">Source monitor</div></div>
+    <div class="stat"><div class="label">UPTIME</div><div class="value cyan" id="uptime">--</div><div class="mini">Current TVA process</div></div>
+  </div>
+
+  <section class="chartcard" id="operations">
+    <div class="charthead"><b>◉ LIVE OPERATIONS</b><span id="opsUpdated">Connecting…</span></div>
+    <div class="speedgrid" id="opsEvents"><div class="speedrow"><b>Waiting for events</b><span>—</span></div></div>
+  </section>
+  <section class="chartcard" id="accessLive">
+    <div class="charthead"><b>🔐 ACCESS & LIVE FIELD</b><span id="accessLiveUpdated">Connecting…</span></div>
+    <div class="grid" style="margin-top:0">
+      <div class="stat"><div class="label">APPROVED USERS</div><div class="value good" id="approvedCount">—</div><div class="mini">Permanent alert access</div></div>
+      <div class="stat"><div class="label">PENDING REQUESTS</div><div class="value cyan" id="pendingAccess">—</div><div class="mini">Awaiting owner review</div></div>
+    </div>
+    <div class="speedgrid" id="liveRounds" style="margin-top:10px">
+      <div class="speedrow"><b>POT / GUESS</b><span>Waiting for live status</span></div>
+    </div>
+  </section>
+  <section class="chartcard" id="analytics">
+    <div class="charthead"><b>◈ POT / GUESS ANALYTICS</b><span>Saved results</span></div>
+    <div class="grid" style="margin-top:0">
+      <div class="stat"><div class="label">POT RESULTS</div><div class="value good" id="potCount">—</div></div>
+      <div class="stat"><div class="label">GUESS RESULTS</div><div class="value good" id="guessCount">—</div></div>
+    </div>
+    <div class="mini">Counts reflect recorded result posts in the archive. They are not prediction accuracy percentages.</div>
+  </section>
+  <section class="chartcard" id="archiveSearch">
+    <div class="charthead"><b>▤ SEARCH TIMELINE ARCHIVES</b><span id="archiveStatus">Ready</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="archiveQuery" placeholder="Search result, number or message ID" style="flex:1;min-width:150px;padding:12px;border-radius:10px;border:1px solid var(--line);background:#151a12;color:var(--white)">
+      <select id="archiveGame" style="padding:12px;border-radius:10px;border:1px solid var(--line);background:#151a12;color:var(--white)"><option value="ALL">ALL EVENTS</option><option value="POT">POT</option><option value="GUESS">GUESS</option><option value="RAIN">RAIN</option><option value="FLAG">FLAG</option></select>
+      <button class="btn primary" id="archiveSearchBtn" style="flex:0 0 auto">SEARCH</button>
+    </div>
+    <div class="speedgrid" id="archiveResults" style="margin-top:10px"><div class="speedrow"><b>Search saved rounds</b><span>Up to 30 matches</span></div></div>
+  </section>
+  <section class="chartcard" id="incidentCenter">
+    <div class="charthead"><b>⚠ INCIDENT CENTER</b><span id="incidentStatus">Recent events</span></div>
+    <div class="speedgrid" id="incidentList"><div class="speedrow"><b>No incident data yet</b><span>—</span></div></div>
+  </section>
+  <section class="chartcard" id="monitorControls">
+    <div class="charthead"><b>⏻ MONITOR CONTROLS</b><span>Protected</span></div>
+    <div class="controlhead"><div><b>⚡ HUNT MODE</b><small id="huntDescription">Manual confirmation mode</small></div><button class="controlbtn off" id="huntToggle" disabled>LOADING</button></div>
+    <div class="speedgrid" id="monitorList"><div class="speedrow"><b>Loading monitor states</b><span>—</span></div></div>
+    <div class="controlhint" id="controlMessage">Verifying owner access…</div>
+    <div class="mini">Only the configured OWNER_ID can change these controls. HUNT automatically submits POT/GUESS predictions; keep it OFF to require manual authorization.</div>
+  </section>
+  <section class="chartcard">
+    <div class="charthead"><b>TVA MODULES</b><span>Quick access</span></div>
+    <div class="modulegrid">
+      <a class="module" href="/logs"><b>▤ Timeline Archives</b><span>Completed POT / GUESS rounds</span></a>
+      <a class="module" href="#speedLab"><b>⚡ Speed Lab</b><span>FLAG · RAIN · POT · GUESS timings</span></a>
+    </div>
+    <div class="mini" style="margin-top:12px">Prediction formulas and owner confirmation controls remain in Telegram.</div>
+  </section>
+  <section class="chartcard"><div class="charthead"><b>TEMPORAL RESPONSE RECORD</b><span id="sampleCount">0 samples</span></div><canvas id="chart" width="600" height="160"></canvas></section>
+  <nav class="bottomnav" aria-label="App navigation"><a class="navitem active" href="#top"><span class="navicon">⌂</span><span>HOME</span></a><a class="navitem" href="#speedLab"><span class="navicon">ϟ</span><span>SPEED</span></a><a class="navitem" href="#accessLive"><span class="navicon">◉</span><span>POINTS</span></a><a class="navitem" href="#archiveSearch"><span class="navicon">▤</span><span>ARCHIVE</span></a><button class="navitem" type="button" id="moreNav"><span class="navicon">⋯</span><span>MORE</span></button></nav>
+  <div class="foot"><b>LOKI (TVA)</b> // TEMPORAL OPERATIONS <span id="updated">· WAITING</span></div>
+</div>
+<script>
+const tg=window.Telegram?.WebApp;
+function updateActiveNav(){
+  const links=[...document.querySelectorAll(".bottomnav .navitem[href]")];
+  let active=links[0];
+  for(const link of links){
+    const target=document.querySelector(link.getAttribute("href"));
+    if(target && target.getBoundingClientRect().top<=window.innerHeight*0.38) active=link;
+  }
+  links.forEach(link=>link.classList.toggle("active",link===active));
+}
+window.addEventListener("scroll",updateActiveNav,{passive:true});
+window.addEventListener("resize",updateActiveNav);try{tg?.ready();tg?.expand();tg?.setHeaderColor?.("#080914");tg?.setBackgroundColor?.("#080914")}catch(e){}
+const $=id=>document.getElementById(id);let samples=[],busy=false;
+function duration(s){s=Math.max(0,Math.floor(s||0));let h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;return h? h+"h "+m+"m":m?m+"m "+sec+"s":sec+"s"}
+function draw(){const c=$("chart"),ctx=c.getContext("2d"),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);ctx.strokeStyle="#414c32";ctx.lineWidth=1;for(let y=20;y<h;y+=35){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}if(!samples.length)return;const max=Math.max(100,...samples)*1.2;ctx.beginPath();samples.forEach((v,i)=>{const x=i*(w/Math.max(1,samples.length-1)),y=h-12-(v/max)*(h-26);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.strokeStyle="#c5d99a";ctx.lineWidth=3;ctx.shadowColor="#c5d99a";ctx.shadowBlur=10;ctx.stroke();ctx.shadowBlur=0;const last=samples.length-1;ctx.beginPath();ctx.arc(last*(w/Math.max(1,samples.length-1)),h-12-(samples[last]/max)*(h-26),5,0,Math.PI*2);ctx.fillStyle="#c7d36f";ctx.fill();$("sampleCount").textContent=samples.length+" sample"+(samples.length===1?"":"s")}
+async function ping(){if(busy)return;busy=true;$("testBtn").textContent="◌ TESTING…";const t=performance.now();try{const r=await fetch("/api/ping?ts="+Date.now(),{cache:"no-store"});const d=await r.json();const browserMs=Math.round(performance.now()-t),ms=Number.isFinite(d.telegram_latency_ms)?d.telegram_latency_ms:browserMs;const shown=d.telegram_ok?ms:browserMs;samples.push(shown);samples=samples.slice(-24);$("latency").textContent=shown;$("percent").innerHTML=(Math.max(0,Math.min(100,100-shown/10))).toFixed(0)+'<small>%</small>';$("ring").style.setProperty("--progress",Math.max(0,Math.min(100,100-shown/10))+"%");$("ringCaption").textContent=shown<100?"Excellent response":shown<250?"Stable response":shown<600?"Response detected":"High latency";$("connection").textContent=d.telegram_ok?"TIMEPAD ONLINE":"API CHECK FAILED";$("liveLabel").textContent=d.telegram_ok?"LIVE":"DEGRADED";$("botStatus").textContent=d.telegram_ok?"ONLINE":"ISSUE";$("botStatus").className="value "+(d.telegram_ok?"good":"");$("dbStatus").textContent=d.database_ok?"CONNECTED":"UNAVAILABLE";$("dbStatus").className="value "+(d.database_ok?"good":"");$("userStatus").textContent=d.user_session_ok?"ACTIVE":"DISCONNECTED";$("userStatus").className="value "+(d.user_session_ok?"good":"");$("uptime").textContent=duration(d.uptime_seconds);$("updated").textContent="· UPDATED "+new Date().toLocaleTimeString();draw()}catch(e){$("connection").textContent="SERVICE UNREACHABLE";$("liveLabel").textContent="OFFLINE";$("botStatus").textContent="OFFLINE";$("botStatus").className="value";$("updated").textContent="· CONNECTION FAILED"}finally{busy=false;$("testBtn").textContent="↻ RUN PING"}}
+async function loadOperations(){
+  try{
+    const r=await fetch("/api/ops?ts="+Date.now(),{cache:"no-store"}),d=await r.json();
+    const events=d.recent_events||[];
+    $("opsUpdated").textContent="Updated "+new Date().toLocaleTimeString();
+    $("opsEvents").innerHTML=events.length?events.slice(0,10).map(e=>'<div class="speedrow"><b>'+String(e.event||"EVENT")+'</b><span>'+Number(e.ms||0).toFixed(1)+' ms · '+new Date(e.at).toLocaleTimeString()+'</span></div>').join(""):'<div class="speedrow"><b>No recent events</b><span>Waiting for FLAG / RAIN / POT / GUESS</span></div>';
+    $("accessLiveUpdated").textContent="Updated "+new Date().toLocaleTimeString();
+    $("approvedCount").textContent=d.approved_users_count??"—";
+    $("pendingAccess").textContent=d.pending_access_requests??"—";
+    const rounds=d.active_rounds||{};
+    $("liveRounds").innerHTML=[
+      ["POT",rounds.POT],
+      ["GUESS",rounds.GUESS]
+    ].map(([name,id])=>'<div class="speedrow"><b>'+name+' ROUND</b><span>'+(id?'Latest source #'+id:'Waiting for next round')+'</span></div>').join("")+
+      '<div class="speedrow"><b>GUESS CROWD</b><span>'+Number(rounds.GUESS_PLAYERS_SEEN||0)+' guesses observed</span></div>';
+    const states=d.monitors||{};
+    $("monitorList").innerHTML=["FLAG","RAIN","POT","GUESS"].map(n=>'<div class="speedrow"><b>'+n+'</b><span>'+(states[n]?"MONITORING":"PAUSED")+'</span></div>').join("");
+    const incidents=d.incidents||[];
+    $("incidentStatus").textContent=incidents.length+" recent records";
+    $("incidentList").innerHTML=incidents.length?incidents.slice(0,8).map(e=>'<div class="speedrow"><b>'+String(e.severity||"info").toUpperCase()+' · '+String(e.source||"SYSTEM")+'</b><span>'+String(e.message||"")+' · '+new Date(e.at).toLocaleTimeString()+'</span></div>').join(""):'<div class="speedrow"><b>No recorded incidents</b><span>New errors appear here when captured</span></div>';
+  }catch(e){$("opsUpdated").textContent="Operations unavailable"}
+}
+async function loadMonitorControls(){
+  try{
+    const r=await fetch("/api/monitor?ts="+Date.now(),{cache:"no-store"}),d=await r.json();
+    const canControl=!!(tg && tg.initData);
+    $("controlMessage").textContent=canControl?"Telegram session detected. Owner verification is required for every change.":"Open this Mini App inside Telegram to use owner controls.";
+    $("monitorList").innerHTML=["FLAG","RAIN","POT","GUESS"].map(name=>{
+      const enabled=!!d.monitors?.[name];
+      return '<div class="speedrow"><b>'+name+' MONITOR</b><button class="controlbtn '+(enabled?'':'off')+'" data-monitor="'+name+'" '+(canControl?'':'disabled')+'>'+(enabled?'ACTIVE':'PAUSED')+'</button></div>';
+    }).join("");
+    $("huntToggle").textContent=d.hunt_enabled?"HUNT ON":"HUNT OFF";
+    $("huntToggle").classList.toggle("off",!d.hunt_enabled);
+    $("huntToggle").disabled=!canControl;
+    $("huntDescription").textContent=d.hunt_enabled?"Automatic POT/GUESS submission enabled":"Manual owner confirmation required";
+  }catch(e){$("controlMessage").textContent="Could not load control states."}
+}
+async function sendControl(action,game,enabled){
+  if(!tg?.initData){$("controlMessage").textContent="Open this app inside Telegram first.";return}
+  $("controlMessage").textContent="Applying change…";
+  try{
+    const r=await fetch("/api/control",{method:"POST",headers:{"Content-Type":"application/json","X-Telegram-Init-Data":tg.initData},body:JSON.stringify({action,game,enabled})});
+    const d=await r.json();
+    $("controlMessage").textContent=d.message||"Control request failed.";
+    if(!r.ok||!d.ok) return;
+    await loadMonitorControls();
+  }catch(e){$("controlMessage").textContent="Control request failed. Check connection and try again."}
+}
+$("monitorList").addEventListener("click",e=>{
+  const button=e.target.closest("button[data-monitor]");if(!button)return;
+  const game=button.dataset.monitor;sendControl("monitor",game,button.textContent.trim()!=="ACTIVE");
+});
+$("huntToggle").addEventListener("click",()=>sendControl("hunt",null,$("huntToggle").textContent.trim()!=="HUNT ON"));
+async function searchArchive(){
+  const q=$("archiveQuery").value.trim(),game=$("archiveGame").value;
+  $("archiveStatus").textContent="Searching…";
+  try{
+    const r=await fetch("/api/archive?q="+encodeURIComponent(q)+"&game="+encodeURIComponent(game)+"&limit=30&ts="+Date.now(),{cache:"no-store"}),d=await r.json();
+    const items=d.items||[];
+    $("archiveStatus").textContent=items.length+" result(s)";
+    $("archiveResults").innerHTML=items.length?items.map(x=>'<div class="speedrow" style="display:block"><b>'+String(x.game||"ROUND")+' · actual '+String(x.actual??"—")+'</b><div style="color:var(--muted);font-size:11px;margin-top:5px">'+String(x.created_at?new Date(x.created_at).toLocaleString():"time unknown")+' · source #'+String(x.source_message_id??"—")+'</div><div style="white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px">'+String(x.result_text||"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]))+'</div></div>').join(""):'<div class="speedrow"><b>No matching saved results</b><span>Try another query</span></div>';
+    $("potCount").textContent=items.filter(x=>x.game==="POT").length+" in results";
+    $("guessCount").textContent=items.filter(x=>x.game==="GUESS").length+" in results";
+  }catch(e){$("archiveStatus").textContent="Search failed"}
+}
+async function loadSpeed(){try{const r=await fetch("/api/speed?ts="+Date.now(),{cache:"no-store"});const d=await r.json();for(const name of ["FLAG","RAIN","POT","GUESS"]){const m=d.metrics?.[name];const el=$("speed"+name);if(!m||!m.count){el.textContent="Waiting for first event";continue}el.textContent="last "+m.last_ms+" ms · avg "+m.avg_ms+" · max "+m.max_ms+" · n="+m.count}$("speedUpdated").textContent="Updated "+new Date().toLocaleTimeString()}catch(e){$("speedUpdated").textContent="Metrics unavailable"}}
+const navItems=[...document.querySelectorAll(".navitem[href]")];navItems.forEach(a=>a.addEventListener("click",()=>{navItems.forEach(n=>n.classList.remove("active"));a.classList.add("active")}));$("moreNav").addEventListener("click",()=>{const sections=["#operations","#incidentCenter","#monitorControls","#analytics"];const current=sections.find(s=>{const el=document.querySelector(s);return el&&el.getBoundingClientRect().top>80});const target=document.querySelector(current||sections[0]);target?.scrollIntoView({behavior:"smooth",block:"start"});navItems.forEach(n=>n.classList.remove("active"));$("moreNav").classList.add("active")});$("archiveSearchBtn").addEventListener("click",searchArchive);$("archiveGame").addEventListener("change",searchArchive);$("archiveQuery").addEventListener("keydown",e=>{if(e.key==="Enter")searchArchive()});$("testBtn").addEventListener("click",ping);$("refreshBtn").addEventListener("click",()=>{ping();loadSpeed()});ping();loadSpeed();loadOperations();loadMonitorControls();searchArchive();setInterval(loadMonitorControls,10000);setInterval(ping,5000);setInterval(loadSpeed,5000);setInterval(loadOperations,10000);
+</script>
+</body></html>
