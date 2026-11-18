@@ -1100,7 +1100,7 @@ def detect_flag_country(text):
     return None
 
 def format_rain_alert(raw_text, source_link, bot_reply="Processing rain claim...", status="Processing"):
-    """Render RAIN notifications in the LOKI • TVA SYSTEM event-log style."""
+    """Render RAIN notifications in the ☀️ NIKA • WARRIOR OF LIBERATION event-log style."""
     raw = clean_text(raw_text or "")
     prize = re.search(r"([\d,]+)\s*points?\b", raw, re.IGNORECASE)
     winners = re.search(r"(\d+)\s*(?:random\s*)?winners?\b", raw, re.IGNORECASE)
@@ -1120,7 +1120,7 @@ def format_rain_alert(raw_text, source_link, bot_reply="Processing rain claim...
         status_line = f"🟡 STATUS: {status}"
 
     lines = [
-        "🌧️ RAIN EVENT DETECTED",
+        "🌧️ TREASURE RAIN SPOTTED",
         "",
         f"💰 Prize Pool　{prize.group(1) + ' POINTS' if prize else 'Not Specified'}",
         f"🎲 Winners　{winners.group(1) if winners else 'Not Specified'}",
@@ -1132,20 +1132,20 @@ def format_rain_alert(raw_text, source_link, bot_reply="Processing rain claim...
     lines += [
         "",
         "━━━━━━━━━━━━━━━━━━",
-        "🤖 TVA AUTOMATION LOG",
+        "🤖 ☀️ DRUMS OF LIBERATION LOG",
         "",
         result_line,
         "",
-        "📡 Telegram Response:",
+        "📡 DEN-DEN MUSHI RESPONSE:",
         reply,
         "",
         status_line,
         "",
-        f"🔗 SOURCE EVENT: {source_link}",
+        f"🔗 GRAND LINE SIGHTING: {source_link}",
         "",
         "━━━━━━━━━━━━━━━━━━",
-        "🕒 LOKI • TVA SYSTEM",
-        "Automated Rain Monitoring & Response",
+        "🕒 ☀️ NIKA • WARRIOR OF LIBERATION",
+        "Automatic Treasure-Rain Watch",
     ]
     return "\n".join(lines)
 
@@ -1162,7 +1162,7 @@ def format_notification(message, event_type):
         f"{'🎯' if event_type == 'GUESS' else '🪙'} {title} DETECTED\n"
         f"\n{clean_text(message.raw_text)}\n"
         f"\n🔗 SOURCE: {get_message_link(message)}\n"
-        f"\nLOKI • TVA SYSTEM"
+        f"\n☀️ NIKA • WARRIOR OF LIBERATION"
     )
 
 async def get_target_user_id(event):
@@ -1188,13 +1188,13 @@ def make_tva_start_image():
         title_font = main_font = small_font = ImageFont.load_default()
     draw.rectangle((14, 14, 986, 406), fill=(220, 199, 145), outline=(29, 27, 19), width=8)
     draw.rectangle((32, 32, 968, 388), outline=(89, 72, 42), width=2)
-    draw.text((55, 45), "TIME VARIANCE AUTHORITY", font=small_font, fill=(67, 56, 34))
-    draw.text((55, 91), "VARIANT CASE FILE", font=title_font, fill=(35, 32, 23))
+    draw.text((55, 45), "THE GRAND LINE", font=small_font, fill=(67, 56, 34))
+    draw.text((55, 91), "WARRIOR OF LIBERATION", font=title_font, fill=(35, 32, 23))
     draw.line((55, 158, 945, 158), fill=(82, 67, 40), width=3)
-    draw.text((58, 190), "VARIANT: LOKI (TVA)", font=main_font, fill=(39, 35, 25))
-    draw.text((58, 238), "STATUS: TIMELINE STABLE", font=small_font, fill=(55, 73, 39))
-    draw.text((58, 279), "POT  /  GUESS  /  RAIN MONITORING ACTIVE", font=small_font, fill=(39, 35, 25))
-    draw.text((58, 340), "WELCOME, VARIANT. CHOOSE A CONSOLE.", font=small_font, fill=(75, 60, 35))
+    draw.text((58, 190), "VARIANT: NIKA • JOY BOY", font=main_font, fill=(39, 35, 25))
+    draw.text((58, 238), "STATUS: DRUMS BEATING", font=small_font, fill=(55, 73, 39))
+    draw.text((58, 279), "POT / GUESS / RAIN • GRAND LINE WATCH", font=small_font, fill=(39, 35, 25))
+    draw.text((58, 340), "WELCOME ABOARD. CHOOSE YOUR COURSE.", font=small_font, fill=(75, 60, 35))
     return image
 
 @bot_client.on(events.NewMessage(pattern=r"^/app(?:@\w+)?$"))
@@ -1206,7 +1206,7 @@ async def app_handler(event):
     # Use Telegram's direct Mini App launch link, not a plain website URL.
     mini_app_link = "https://t.me/LokiTVA_Bot?startapp=dashboard"
     await event.reply(
-        "🕰️ LOKI (TVA) · TIMEPAD\nTap below to open the Mini App inside Telegram:",
+        "🕰️ ☀️ NIKA • MINI DEN-DEN MUSHI\nTap below to open the Mini App inside Telegram:",
         buttons=[[Button.url("▣ OPEN LOKI MINI APP", mini_app_link)]],
         link_preview=False,
     )
@@ -1214,7 +1214,7 @@ async def app_handler(event):
 def help_section_text(section="core"):
     sections = {
         "core": (
-            "🏠 CORE COMMANDS\n"
+            "☀️ CREW COMMANDS\n"
             "/start — Open the command center\n"
             "/help — Open this command menu\n"
             "/status — System, database and HUNT status\n"
@@ -1225,17 +1225,17 @@ def help_section_text(section="core"):
             "/stickerpack [link/name] — View or change the RAIN/reply sticker pack\n"
         ),
         "pot": (
-            "🪙 POT COMMANDS & DATA\n"
+            "🪙 POT • TREASURE RECORDS\n"
             "/potstats [limit] — POT prize history (newest first)\n"
             "POT learning uses completed winning ranges; actual POT values are not always available.\n"
         ),
         "guess": (
-            "🎯 GUESS COMMANDS & DATA\n"
+            "🎯 GUESS • OBSERVATION HAKI\n"
             "/guessstats [limit] — GUESS prize history (newest first)\n"
             "GUESS prize ranking needs the other players' guesses; missing crowd data is not invented.\n"
         ),
         "access": (
-            "🔐 ACCESS CONTROL · OWNER ONLY\n"
+            "🏴‍☠️ CREW ACCESS • CAPTAIN ONLY\n"
             "/approve USER_ID — Grant alert-only access\n"
             "/unapprove USER_ID — Remove alert access\n"
             "/approved — List approved users\n"
@@ -1243,7 +1243,7 @@ def help_section_text(section="core"):
             "/requestaccess — Request access in a private chat\n"
         ),
         "automation": (
-            "⚙️ AUTOMATION & MONITORING\n"
+            "🌊 GRAND LINE • AUTO SAIL\n"
             "/hunt — Enable manual auto-submit\n"
             "/huntpanel — Open HUNT and timer controls\n"
             "/stop — Disable manual auto-submit\n"
@@ -1252,7 +1252,7 @@ def help_section_text(section="core"):
         ),
     }
     return (
-        "📘 FIELD MANUAL · LOKI (TVA)\n"
+        "📘 FIELD MANUAL · NIKA • JOY BOY\n"
         "━━━━━━━━━━━━━━━━━━━━\n"
         + sections.get(section, sections["core"])
         + "\n🔒 Owner-only controls. Approved users receive source alerts only."
@@ -1266,7 +1266,7 @@ def help_menu_buttons():
          Button.inline("🎯 GUESS", b"menu:section:guess")],
         [Button.inline("🔐 ACCESS", b"menu:section:access"),
          Button.inline("⚙️ AUTOMATION", b"menu:section:automation")],
-        [Button.inline("▣ TIMELINE STATUS", b"menu:status")],
+        [Button.inline("☀️ GRAND LINE STATUS", b"menu:status")],
     ]
 
 
@@ -1277,9 +1277,9 @@ async def start_handler(event):
     import io
     start_image = os.path.join(os.path.dirname(__file__), "assets", "tva_start.jpg")
     caption = (
-        "🕰️ LOKI (TVA) · COMMAND CENTER\n"
-        "🟢 MONITORING  •  🪙 POT  •  🎯 GUESS  •  🌧️ RAIN  •  🏳️ FLAG\n\n"
-        "Choose a command section below. Completed game results are saved automatically."
+        "🕰️ ☀️ NIKA • JOY BOY COMMAND DECK\n"
+        "☀️ DRUMS BEATING  •  🪙 POT  •  🎯 GUESS  •  🌧️ RAIN  •  🏴‍☠️ FLAG\n\n"
+        "Choose your course below, Captain. Every completed round is preserved in the logbook."
     )
     buttons = help_menu_buttons()
     if os.path.isfile(start_image):
@@ -1314,7 +1314,7 @@ async def menu_callback(event):
     last_pot = load_last_pot_answer() if db_ok else None
     last_guess = load_last_guess_answer() if db_ok else None
     await event.edit(
-        "⚡ // TIMELINE REPORT ◈\n"
+        "☀️ // JOY BOY'S LOGBOOK ◈\n"
         f"🖥️ System          {'ONLINE' if bot_client.is_connected() else 'DEGRADED'}\n"
         f"🗃️ Database        {'CONNECTED' if db_ok else 'UNAVAILABLE'}\n"
         f"👥 Approved users  {len(approved_users)}\n"
@@ -1406,7 +1406,7 @@ async def ping_handler(event):
     output.name = "loki_tva_ping.jpg"
     health = "HEALTHY" if telegram_ok and db_ok and user_ok else "DEGRADED"
     caption = (
-        "LOKI (TVA) // LIVE TIMEPAD DIAGNOSTICS\n"
+        "☀️ NIKA // LIVE VITALS\n"
         f"Overall: {health}\n"
         f"Telegram API: {telegram_ms if telegram_ms is not None else 'N/A'} ms\n"
         f"Database: {'CONNECTED' if db_ok else 'OFFLINE'}\n"
@@ -1425,7 +1425,7 @@ async def notify_approved_users(message, event_type):
         return
     label = {"POT": "🪙 POT", "GUESS": "🎯 GUESS", "RAIN": "🌧️ RAIN"}[event_type]
     text_value = (
-        "🔔 MAZEPOT NOTIFICATION\n"
+        "☀️ NIKA • CREW TRANSMISSION\n"
         f"{label} update detected.\n\n"
         f"{clean_text(getattr(message, 'raw_text', '') or '')}\n\n"
         f"Source: {get_message_link(message)}"
@@ -1501,11 +1501,11 @@ async def request_access_handler(event):
     if not save_access_request(user_id, getattr(sender, "username", ""), getattr(sender, "first_name", "")):
         await event.reply("Request could not be saved. Please try again later.")
         return
-    await event.reply("TVA ACCESS REQUEST\nYour request was sent to the owner. Access is not granted until approved.")
+    await event.reply("🏴‍☠️ CREW 🏴‍☠️ CREW REQUEST\nYour request was sent to the owner. Access is not granted until approved.")
     try:
         label = f"@{sender.username}" if getattr(sender, "username", None) else (getattr(sender, "first_name", None) or "User")
         await bot_client.send_message(OWNER_ID,
-            f"ACCESS REQUEST\nUser: {label}\nID: {user_id}\nApprove permanent access or reject.",
+            f"🏴‍☠️ CREW REQUEST\nUser: {label}\nID: {user_id}\nApprove permanent access or reject.",
             buttons=[[Button.inline("APPROVE", data=f"access_request:approve:{user_id}".encode()),
                       Button.inline("REJECT", data=f"access_request:reject:{user_id}".encode())]])
     except Exception as e:
@@ -1525,17 +1525,17 @@ async def access_request_callback(event):
             return
         approved_users.add(user_id)
         set_access_request_status(user_id, "approved")
-        await event.edit(f"ACCESS APPROVED\nUser ID: {user_id}\nAccess: permanent\nPermissions: source alerts only.")
+        await event.edit(f"🏴‍☠️ CREW ACCESS GRANTED\nUser ID: {user_id}\nAccess: permanent\nPermissions: source alerts only.")
         try:
-            await bot_client.send_message(user_id, "Your LOKI (TVA) access request was approved. You will receive source alerts only.")
+            await bot_client.send_message(user_id, "Your NIKA access request was approved. You will receive source alerts only.")
         except Exception as e:
             print(f"[ACCESS] Approval DM failed for {user_id}: {type(e).__name__}")
         await event.answer("Permanent access granted.")
     else:
         set_access_request_status(user_id, "rejected")
-        await event.edit(f"ACCESS REQUEST REJECTED\nUser ID: {user_id}")
+        await event.edit(f"🏴‍☠️ CREW REQUEST REJECTED\nUser ID: {user_id}")
         try:
-            await bot_client.send_message(user_id, "Your LOKI (TVA) access request was not approved.")
+            await bot_client.send_message(user_id, "Your NIKA access request was not approved.")
         except Exception as e:
             print(f"[ACCESS] Rejection DM failed for {user_id}: {type(e).__name__}")
         await event.answer("Request rejected.")
@@ -1547,9 +1547,9 @@ async def approved_users_handler(event):
         return
     ids = sorted(approved_users)
     if not ids:
-        await event.reply("APPROVED ACCESS\nNo users are currently approved.")
+        await event.reply("🏴‍☠️ ALLIED CREW\nNo users are currently approved.")
         return
-    await event.reply("APPROVED ACCESS · " + str(len(ids)) + " USERS\n" +
+    await event.reply("🏴‍☠️ ALLIED CREW · " + str(len(ids)) + " USERS\n" +
         "\n".join(f"{index}. {user_id}" for index, user_id in enumerate(ids, 1)) +
         "\n\nUse /unapprove USER_ID to revoke access.")
 
@@ -1567,7 +1567,7 @@ async def access_info_handler(event):
         return
     approved = target_id in approved_users
     pending = any(int(row.get("user_id", 0)) == target_id for row in get_access_requests())
-    await event.reply("TVA ACCESS FILE\n"
+    await event.reply("🏴‍☠️ CREW DOSSIER\n"
         f"User ID: {target_id}\n"
         f"Approval: {'PERMANENT' if approved else 'NOT APPROVED'}\n"
         f"Pending request: {'YES' if pending else 'NO'}\n"
@@ -1578,7 +1578,7 @@ async def access_info_handler(event):
 async def live_games_handler(event):
     if event.sender_id != OWNER_ID:
         return
-    lines = ["LOKI (TVA) · LIVE FIELD STATUS", "━━━━━━━━━━━━━━━━━━━━"]
+    lines = ["☀️ NIKA • GRAND LINE STATUS", "━━━━━━━━━━━━━━━━━━━━"]
     for game in ("POT", "GUESS", "RAIN", "FLAG"):
         state = "MONITORING" if MONITOR_STATES.get(game, False) else "PAUSED"
         round_id = latest_game_round_ids.get((int(SOURCE_CHAT_ID), game)) if game in ("POT", "GUESS") else None
@@ -1597,7 +1597,7 @@ async def live_games_handler(event):
 async def speed_handler(event):
     if event.sender_id != OWNER_ID:
         return
-    lines = ["⚡ LOKI (TVA) SPEED", "━━━━━━━━━━━━━━━━━━━━"]
+    lines = ["⚡ ☀️ NIKA • HAKI SPEED", "━━━━━━━━━━━━━━━━━━━━"]
     for name in ("FLAG", "RAIN", "POT", "GUESS"):
         m = SPEED_METRICS[name]
         if m["count"]:
@@ -2425,7 +2425,7 @@ async def rain_retry_worker():
                                 status="Grab clicked",
                             )
                         else:
-                            updated_text = f"🌧️ RAIN JOINED\nLOKI clicked Grab for source post #{message_id}.\n\nLOKI • TVA SYSTEM"
+                            updated_text = f"🌧️ RAIN JOINED\nLOKI clicked Grab for source post #{message_id}.\n\n☀️ NIKA • WARRIOR OF LIBERATION"
                         await bot_client.edit_message(OWNER_ID, owner_message_id, updated_text)
                     print(f"[RAIN] Automatic retry succeeded | source_chat={source_chat_id} | source_message={message_id}")
                 else:
@@ -2466,7 +2466,7 @@ async def retry_pending_rains_after_owner_activity(message):
                             status="Grab clicked",
                         )
                     else:
-                        updated_text = f"🌧️ RAIN JOINED\\nLOKI clicked Grab for source post #{key[1]}.\\n\\nLOKI • TVA SYSTEM"
+                        updated_text = f"🌧️ RAIN JOINED\\nLOKI clicked Grab for source post #{key[1]}.\\n\\n☀️ NIKA • WARRIOR OF LIBERATION"
                     await bot_client.edit_message(OWNER_ID, owner_message_id, updated_text, buttons=None)
                 print(f"[RAIN] Grab succeeded immediately after genuine owner activity | source_message={key[1]}")
             elif status != "activity_required":
@@ -2835,7 +2835,7 @@ async def process_source_alert(message):
                     header_text + "\n\n"
                     + (f"🟢 AUTO-SUBMITTED: {prediction}\n" if sent else f"⚠️ AUTO-SUBMIT FAILED: {save_status}\n")
                     + f"ALTERNATES: {backups[0]} / {backups[1]}\nMETHOD: {method}\n"
-                    + "HUNT MODE is ON. Use /stop to return to manual confirmation."
+                    + "HUNT is active. Use /stop to return to manual confirmation."
                 )
                 if fast_notice:
                     await fast_notice.edit(final_text, link_preview=False)
@@ -2882,7 +2882,7 @@ async def process_source_alert(message):
                 f"🎯 Reward: {prize_text}\n"
                 f"⏳ Time limit: {timer_text}\n\n"
                 f"🔗 Source: {get_message_link(message)}\n\n"
-                "⚡ LOKI • TVA SYSTEM\n\n"
+                "⚡ ☀️ NIKA • WARRIOR OF LIBERATION\n\n"
                 f"🏳️ IDENTIFIED: {country}\n"
                 "Confirm to send?"
             )
@@ -2891,7 +2891,7 @@ async def process_source_alert(message):
             final_text = (
                 "🏳️ FLAG NEEDS REVIEW\n\n"
                 f"🔗 Source: {get_message_link(message)}\n\n"
-                "⚡ LOKI • TVA SYSTEM\n"
+                "⚡ ☀️ NIKA • WARRIOR OF LIBERATION\n"
                 "No country could be identified automatically."
             )
             buttons = None
@@ -3314,7 +3314,7 @@ async def health_server():
                     content_type = b"text/html; charset=utf-8"
                 except Exception as e:
                     print(f"[PING] Dashboard file could not be read: {e}")
-                    body = b"LOKI (TVA) Timepad dashboard is not installed."
+                    body = b"NIKA • JOY BOY Timepad dashboard is not installed."
                     content_type = b"text/plain; charset=utf-8"
             elif path == "/logs":
                 pot_logs = get_recent_results("POT", 4) or []
@@ -3335,10 +3335,10 @@ async def health_server():
                 html = (
                     "<!doctype html><html><head><meta charset='utf-8'>"
                     "<meta name='viewport' content='width=device-width,initial-scale=1'>"
-                    "<title>LOKI (TVA) · Variant Archives</title><style>"
+                    "<title>NIKA • JOY BOY · Variant Archives</title><style>"
                     "body{font:15px ui-monospace,SFMono-Regular,monospace;background:radial-gradient(ellipse at top,#303a25 0%,#1b2117 55%,#11140e 100%);color:#e5e8d0;max-width:1000px;margin:0 auto;padding:24px 16px;min-height:100vh}"
                     "h1{font:900 28px system-ui,sans-serif;letter-spacing:2px;color:#c5d99a;text-shadow:0 0 18px #94b36a33}p{color:#a8b18d}section{background:rgba(28,32,22,.94);border:1px solid #596b43;border-radius:8px;padding:18px;margin:20px 0;box-shadow:0 10px 32px #0004}h2{font:700 16px system-ui,sans-serif;letter-spacing:2px;color:#d4c58a;text-transform:uppercase}article{border:1px solid #414c32;border-left:3px solid #a9c77b;background:#171b13;padding:14px;margin:12px 0}article:nth-child(even){border-left-color:#d5a45d}.meta{font-size:12px;color:#b5bd8d;margin-bottom:9px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;margin:0;color:#e5e8d0}footer{border-top:1px solid #414c32;color:#929c78;padding-top:14px;font-size:11px;letter-spacing:1px}"
-                    "</style></head><body><h1>LOKI (TVA) // VARIANT ARCHIVES</h1>"
+                    "</style></head><body><h1>NIKA • JOY BOY // VARIANT ARCHIVES</h1>"
                     "<p>Last 4 completed result posts per game · times in UTC</p>"
                     "<section><h2>POT</h2>" + render_results(pot_logs) +
                     "</section><section><h2>GUESS</h2>" + render_results(guess_logs) +
@@ -3347,7 +3347,7 @@ async def health_server():
                 body = html.encode("utf-8")
                 content_type = b"text/html; charset=utf-8"
             else:
-                body = b"LOKI (TVA) temporal services are operational."
+                body = b"NIKA • JOY BOY temporal services are operational."
                 content_type = b"text/plain; charset=utf-8"
 
             response = (
@@ -3445,7 +3445,7 @@ async def main():
     bot_me = await bot_client.get_me()
 
     print("=" * 40)
-    print("       LOKI (TVA)")
+    print("       NIKA • JOY BOY")
     print("=" * 40)
     print(f"User account : {me.id}")
     print(f"Bot          : @{bot_me.username}")
