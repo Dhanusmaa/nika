@@ -1175,8 +1175,8 @@ async def get_target_user_id(event):
         return int(parts[1])
     return int(event.sender_id) if event.sender_id else None
 
-def make_tva_start_image():
-    """Build a TVA case-file image as a safe fallback when no custom asset is installed."""
+def make_nika_start_image():
+    """Build a Joy Boy welcome image as a safe fallback when no custom asset is installed."""
     from PIL import Image, ImageDraw, ImageFont
     image = Image.new("RGB", (1000, 420), (24, 15, 21))
     draw = ImageDraw.Draw(image)
@@ -1199,7 +1199,7 @@ def make_tva_start_image():
 
 @bot_client.on(events.NewMessage(pattern=r"^/app(?:@\w+)?$"))
 async def app_handler(event):
-    # Allow /app in groups so members can open the TVA dashboard.
+    # Allow /app in groups so members can open the Nika dashboard.
     if not WEBAPP_URL:
         await event.reply("⚠️ App link is not configured. Set WEBAPP_URL in the deployment environment.")
         return
@@ -1275,7 +1275,7 @@ async def start_handler(event):
     if event.sender_id != OWNER_ID:
         return
     import io
-    start_image = os.path.join(os.path.dirname(__file__), "assets", "tva_start.jpg")
+    start_image = os.path.join(os.path.dirname(__file__), "assets", "nika_start.jpg")
     caption = (
         "🕰️ ☀️ NIKA • JOY BOY COMMAND DECK\n"
         "☀️ DRUMS BEATING  •  🪙 POT  •  🎯 GUESS  •  🌧️ RAIN  •  🏴‍☠️ FLAG\n\n"
@@ -1286,9 +1286,9 @@ async def start_handler(event):
         await event.respond(file=start_image, message=caption, buttons=buttons)
     else:
         output = io.BytesIO()
-        make_tva_start_image().save(output, format="JPEG", quality=90, optimize=True)
+        make_nika_start_image().save(output, format="JPEG", quality=90, optimize=True)
         output.seek(0)
-        output.name = "loki_tva_start.jpg"
+        output.name = "nika_joyboy_start.jpg"
         await event.respond(file=output, message=caption, buttons=buttons)
 
 
@@ -1392,7 +1392,7 @@ async def ping_handler(event):
         font = ImageFont.load_default()
 
     # Draw live status values over the Joy Boy poster.
-    # Coordinates are proportional to the reference poster's right-side TIMEPAD panel.
+    # Coordinates align with the live-value panel on the Joy Boy status poster.
     scale_x = canvas.width / 1445
     scale_y = canvas.height / 1089
     value_x = int(1014 * scale_x)
@@ -1414,7 +1414,7 @@ async def ping_handler(event):
     output = io.BytesIO()
     canvas.save(output, format="JPEG", quality=90, optimize=True)
     output.seek(0)
-    output.name = "loki_tva_ping.jpg"
+    output.name = "nika_joyboy_ping.jpg"
     health = "HEALTHY" if telegram_ok and db_ok and user_ok else "DEGRADED"
     caption = (
         "☀️ NIKA // LIVE VITALS\n"
@@ -1716,7 +1716,7 @@ async def status_handler(event):
     last_pot = load_last_pot_answer() if db_ok else None
     last_guess = load_last_guess_answer() if db_ok else None
     report = (
-        '📊 MAZEPOT STATUS '
+        '☀️ NIKA • GRAND LINE STATUS '
         '\n'
         f'🖥️ System          {"ONLINE" if bot_client.is_connected() else "DEGRADED"}\n'
         f'🗃️ Database        {"CONNECTED" if db_ok else "UNAVAILABLE"}\n'
@@ -3325,7 +3325,7 @@ async def health_server():
                     content_type = b"text/html; charset=utf-8"
                 except Exception as e:
                     print(f"[PING] Dashboard file could not be read: {e}")
-                    body = b"NIKA • JOY BOY Timepad dashboard is not installed."
+                    body = b"NIKA • JOY BOY dashboard is not installed."
                     content_type = b"text/plain; charset=utf-8"
             elif path == "/logs":
                 pot_logs = get_recent_results("POT", 4) or []
