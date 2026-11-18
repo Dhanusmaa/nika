@@ -3330,7 +3330,7 @@ async def health_server():
                     content_type = b"text/html; charset=utf-8"
                 except Exception as e:
                     print(f"[PING] Dashboard file could not be read: {e}")
-                    body = b"NIKA • JOY BOY dashboard is not installed."
+                    body = "NIKA • JOY BOY dashboard is not installed.".encode("utf-8")
                     content_type = b"text/plain; charset=utf-8"
             elif path == "/logs":
                 pot_logs = get_recent_results("POT", 4) or []
