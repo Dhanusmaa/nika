@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: mazepot
+    name: nika-joyboy
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
