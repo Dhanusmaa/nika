@@ -2911,6 +2911,26 @@ async def process_source_alert(message):
                 "No country could be identified automatically."
             )
             buttons = None
+
+        # FLAG detection builds the alert above; explicitly deliver it to the owner.
+        try:
+            flag_notice = await bot_client.send_message(
+                OWNER_ID, final_text, buttons=buttons, link_preview=False
+            )
+            print(
+                f"[FLAG] Owner notified | source_chat={message.chat_id} "
+                f"| source_message={message.id} | detected={bool(country)} "
+                f"| notice={getattr(flag_notice, 'id', None)}"
+            )
+            record_speed_metric("FLAG", speed_started_at)
+        except Exception as e:
+            print(
+                f"[FLAG] Owner notification failed | source_chat={message.chat_id} "
+                f"| source_message={message.id} | {type(e).__name__}: {e}"
+            )
+            record_incident("FLAG", e, "error")
+        return
+
     if event_type == "RAIN":
         if int(message.chat_id) == int(RAIN_ACTIVITY_CHAT_ID):
             queue_rain_inactivity_activity(int(message.chat_id), int(message.id))
