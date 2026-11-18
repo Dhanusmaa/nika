@@ -2346,6 +2346,10 @@ async def reply_with_game_sticker_if_needed(event):
             )
             return
         event_type, sent_at = tracked
+        # RAIN already has its own single activity sticker workflow. Never
+        # send a second sticker as a reply to a RAIN activity message.
+        if event_type == "RAIN":
+            return
         age = time.monotonic() - sent_at
         if age > GAME_REPLY_STICKER_WINDOW:
             recent_game_messages.pop(key, None)
@@ -2976,11 +2980,11 @@ async def process_source_alert(message):
         return
 
     if event_type == "RAIN":
-        if int(message.chat_id) == int(RAIN_ACTIVITY_CHAT_ID):
-            queue_rain_inactivity_activity(int(message.chat_id), int(message.id))
         if message.id in processed_rain_alert_ids:
             return
         processed_rain_alert_ids.add(message.id)
+        if int(message.chat_id) == int(RAIN_ACTIVITY_CHAT_ID):
+            queue_rain_inactivity_activity(int(message.chat_id), int(message.id))
 
         # Tell the owner immediately; the Telegram Grab-button operation can
         # take several network round trips and must not delay the alert.
