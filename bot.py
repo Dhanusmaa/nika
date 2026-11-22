@@ -2164,11 +2164,20 @@ async def hunt_handler(event):
 
 @bot_client.on(events.NewMessage(pattern=r"^/stop(?:@\w+)?$"))
 async def stop_hunt_handler(event):
-    global hunt_manual_enabled
+    global hunt_manual_enabled, rain_inactivity_activity_task, rain_retry_worker_task
     if event.sender_id != OWNER_ID:
         return
     hunt_manual_enabled = False
     refresh_effective_hunt_state()
+    if not hunt_enabled:
+        if rain_inactivity_activity_task and not rain_inactivity_activity_task.done():
+            rain_inactivity_activity_task.cancel()
+        rain_inactivity_activity_task = None
+        pending_rain_retries.clear()
+        if rain_retry_worker_task and not rain_retry_worker_task.done():
+            rain_retry_worker_task.cancel()
+        rain_retry_worker_task = None
+        print("[RAIN] Sticker timer and pending JOIN retries stopped because HUNT is OFF.")
     await event.reply(
         "🛑 MANUAL HUNT DISABLED\n"
         "The daily timer remains independent and can still enable HUNT during its window.\n"
@@ -2405,7 +2414,9 @@ def rain_has_activity_gate(result):
 
 
 async def click_rain_grab(source_chat_id, message_id):
-    """Click the source Grab button; return (status, response text)."""
+    """Click the source Grab button only while HUNT is active."""
+    if not hunt_enabled:
+        return "hunt_off", "HUNT is OFF. RAIN joining is paused until /hunt is enabled."
     if message_id in processed_rain_completed_ids:
         return "already", "This Rain claim was already attempted."
     rain_message = await user_client.get_messages(source_chat_id, ids=message_id)
@@ -2430,9 +2441,13 @@ async def click_rain_grab(source_chat_id, message_id):
 
 
 async def rain_retry_worker():
-    """Retry pending RAIN claims while Telegram's genuine-activity gate is pending."""
-    while pending_rain_retries:
+    """Retry pending RAIN claims only while HUNT is active."""
+    while pending_rain_retries and hunt_enabled:
         for key, state in list(pending_rain_retries.items()):
+            if not hunt_enabled:
+                pending_rain_retries.clear()
+                print("[RAIN] Pending JOIN retries cleared because HUNT is OFF.")
+                return
             source_chat_id, message_id = key
             if state.get("retrying"):
                 continue
@@ -2473,8 +2488,8 @@ async def rain_retry_worker():
 
 
 async def retry_pending_rains_after_owner_activity(message):
-    """Immediately retry pending RAIN claims after the account sends a genuine group message."""
-    if not getattr(message, "out", False):
+    """Retry pending RAIN claims after owner activity, but only during HUNT."""
+    if not hunt_enabled or not getattr(message, "out", False):
         return
     source_chat_id = int(getattr(message, "chat_id", 0) or 0)
     for key, state in list(pending_rain_retries.items()):
@@ -2562,7 +2577,10 @@ async def get_rain_sticker_document(index=0):
 
 
 async def send_rain_activity_sticker(source_chat_id, rain_message_id, sticker_index=None):
-    """Send a pack sticker without deleting it; index is zero-based when explicitly supplied."""
+    """Send a RAIN activity sticker only while HUNT is active."""
+    if not hunt_enabled:
+        print(f"[RAIN] Sticker skipped because HUNT is OFF | rain_message={rain_message_id}")
+        return None
     if sticker_index is None:
         sticker_set = await user_client(
             functions.messages.GetStickerSetRequest(
@@ -2578,6 +2596,9 @@ async def send_rain_activity_sticker(source_chat_id, rain_message_id, sticker_in
         sticker = await get_rain_sticker_document(sticker_index)
     delay = random.uniform(RAIN_STICKER_DELAY_MIN, RAIN_STICKER_DELAY_MAX)
     await asyncio.sleep(delay)
+    if not hunt_enabled:
+        print(f"[RAIN] Sticker cancelled because HUNT turned OFF | rain_message={rain_message_id}")
+        return None
     sent = await user_client.send_file(int(source_chat_id), sticker)
     remember_game_message(source_chat_id, sent, "RAIN")
     print(
@@ -2592,14 +2613,15 @@ async def rain_inactivity_activity_after_event(source_chat_id, rain_message_id):
     """Only a detected RAIN event can trigger a sticker after 15 minutes of owner inactivity."""
     global rain_inactivity_activity_task
     try:
-        while True:
+        while hunt_enabled:
             idle_for = time.monotonic() - rain_last_owner_activity_at
             remaining = RAIN_INACTIVITY_SECONDS - idle_for
             if remaining <= 0:
                 break
             await asyncio.sleep(min(remaining, 5))
 
-        await send_rain_activity_sticker(source_chat_id, rain_message_id)
+        if hunt_enabled:
+            await send_rain_activity_sticker(source_chat_id, rain_message_id)
     except asyncio.CancelledError:
         raise
     except Exception as e:
@@ -2609,8 +2631,11 @@ async def rain_inactivity_activity_after_event(source_chat_id, rain_message_id):
 
 
 def queue_rain_inactivity_activity(source_chat_id, rain_message_id):
-    """Start at most one inactivity activity timer, and only after a RAIN event."""
+    """Queue the RAIN sticker timer only while HUNT is active."""
     global rain_inactivity_activity_task
+    if not hunt_enabled:
+        print(f"[RAIN] Sticker timer not queued because HUNT is OFF | rain_message={rain_message_id}")
+        return
     if rain_inactivity_activity_task is None or rain_inactivity_activity_task.done():
         rain_inactivity_activity_task = asyncio.create_task(
             rain_inactivity_activity_after_event(source_chat_id, rain_message_id)
@@ -2983,7 +3008,7 @@ async def process_source_alert(message):
         if message.id in processed_rain_alert_ids:
             return
         processed_rain_alert_ids.add(message.id)
-        if int(message.chat_id) == int(RAIN_ACTIVITY_CHAT_ID):
+        if int(message.chat_id) == int(RAIN_ACTIVITY_CHAT_ID) and hunt_enabled:
             queue_rain_inactivity_activity(int(message.chat_id), int(message.id))
 
         # Tell the owner immediately; the Telegram Grab-button operation can
@@ -3004,8 +3029,15 @@ async def process_source_alert(message):
         asyncio.create_task(dispatch_rain_notice())
 
         source_chat_id = int(message.chat_id)
-        status, response_text = await click_rain_grab(source_chat_id, message.id)
-        if status == "activity_required":
+        if not hunt_enabled:
+            status, response_text = "hunt_off", "HUNT is OFF. Automatic RAIN joining is paused; use /hunt to enable it."
+        else:
+            status, response_text = await click_rain_grab(source_chat_id, message.id)
+        if status == "hunt_off":
+            bot_reply = response_text
+            status_text = "HUNT is OFF · JOIN paused"
+            owner_buttons = None
+        elif status == "activity_required":
             bot_reply = "Telegram requires genuine recent activity from your account in this group. Open the group and send a normal message; NIKA will keep retrying. You can also tap RETRY GRAB after sending it."
             status_text = "Waiting for chat activity"
             owner_buttons = [[
