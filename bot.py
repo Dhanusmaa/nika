@@ -2164,24 +2164,19 @@ async def hunt_handler(event):
 
 @bot_client.on(events.NewMessage(pattern=r"^/stop(?:@\w+)?$"))
 async def stop_hunt_handler(event):
-    global hunt_manual_enabled, rain_inactivity_activity_task, rain_retry_worker_task
+    global hunt_manual_enabled, rain_inactivity_activity_task
     if event.sender_id != OWNER_ID:
         return
     hunt_manual_enabled = False
     refresh_effective_hunt_state()
-    if not hunt_enabled:
-        if rain_inactivity_activity_task and not rain_inactivity_activity_task.done():
-            rain_inactivity_activity_task.cancel()
-        rain_inactivity_activity_task = None
-        pending_rain_retries.clear()
-        if rain_retry_worker_task and not rain_retry_worker_task.done():
-            rain_retry_worker_task.cancel()
-        rain_retry_worker_task = None
-        print("[RAIN] Sticker timer and pending JOIN retries stopped because HUNT is OFF.")
+    if rain_inactivity_activity_task and not rain_inactivity_activity_task.done():
+        rain_inactivity_activity_task.cancel()
+    rain_inactivity_activity_task = None
+    print("[RAIN] HUNT stopped; RAIN JOIN and pending retries remain active 24/7.")
     await event.reply(
         "🛑 MANUAL HUNT DISABLED\n"
-        "The daily timer remains independent and can still enable HUNT during its window.\n"
-        f"Effective auto-submit is {'ON' if hunt_enabled else 'OFF'}."
+        "RAIN automatic JOIN remains ON 24/7; only HUNT-linked stickers and POT/GUESS automation are affected.\n"
+        f"Daily timer state: {'ON' if hunt_enabled else 'OFF'}."
     )
     print("[HUNT] Manual mode disabled; scheduled mode unchanged")
 
@@ -2414,9 +2409,7 @@ def rain_has_activity_gate(result):
 
 
 async def click_rain_grab(source_chat_id, message_id):
-    """Click the source Grab button only while HUNT is active."""
-    if not hunt_enabled:
-        return "hunt_off", "HUNT is OFF. RAIN joining is paused until /hunt is enabled."
+    """Automatically click the source Grab button whenever a RAIN event is detected."""
     if message_id in processed_rain_completed_ids:
         return "already", "This Rain claim was already attempted."
     rain_message = await user_client.get_messages(source_chat_id, ids=message_id)
@@ -2441,13 +2434,9 @@ async def click_rain_grab(source_chat_id, message_id):
 
 
 async def rain_retry_worker():
-    """Retry pending RAIN claims only while HUNT is active."""
-    while pending_rain_retries and hunt_enabled:
+    """Retry pending RAIN claims continuously, independent of HUNT."""
+    while pending_rain_retries:
         for key, state in list(pending_rain_retries.items()):
-            if not hunt_enabled:
-                pending_rain_retries.clear()
-                print("[RAIN] Pending JOIN retries cleared because HUNT is OFF.")
-                return
             source_chat_id, message_id = key
             if state.get("retrying"):
                 continue
@@ -2488,8 +2477,8 @@ async def rain_retry_worker():
 
 
 async def retry_pending_rains_after_owner_activity(message):
-    """Retry pending RAIN claims after owner activity, but only during HUNT."""
-    if not hunt_enabled or not getattr(message, "out", False):
+    """Retry pending RAIN claims after genuine owner activity, independent of HUNT."""
+    if not getattr(message, "out", False):
         return
     source_chat_id = int(getattr(message, "chat_id", 0) or 0)
     for key, state in list(pending_rain_retries.items()):
@@ -3029,10 +3018,7 @@ async def process_source_alert(message):
         asyncio.create_task(dispatch_rain_notice())
 
         source_chat_id = int(message.chat_id)
-        if not hunt_enabled:
-            status, response_text = "hunt_off", "HUNT is OFF. Automatic RAIN joining is paused; use /hunt to enable it."
-        else:
-            status, response_text = await click_rain_grab(source_chat_id, message.id)
+        status, response_text = await click_rain_grab(source_chat_id, message.id)
         if status == "hunt_off":
             bot_reply = response_text
             status_text = "HUNT is OFF · JOIN paused"
