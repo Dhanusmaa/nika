@@ -51,6 +51,8 @@ RAIN_INACTIVITY_SECONDS = 15 * 60
 DEFAULT_RAIN_STICKER_PACK = "kang_pack_5250696460_static_by_afckangbot"
 RAIN_STICKER_PACK = DEFAULT_RAIN_STICKER_PACK
 GAME_REPLY_STICKER_NUMBER = 1  # One-based sticker number selected for reply reactions.
+GAME_REPLY_STICKER_DELAY_MIN = 5  # Random delay before reacting to a member's reply.
+GAME_REPLY_STICKER_DELAY_MAX = 10
 RAIN_STICKER_DELAY_MIN = 5
 RAIN_STICKER_DELAY_MAX = 10
 _rain_sticker_set_cache = None
@@ -2359,12 +2361,19 @@ async def reply_with_game_sticker_if_needed(event):
             recent_game_messages.pop(key, None)
             print(f"[{event_type}] Reply window expired | message={reply_to_id} | age={age:.1f}s")
             return
+        delay = random.uniform(GAME_REPLY_STICKER_DELAY_MIN, GAME_REPLY_STICKER_DELAY_MAX)
+        await asyncio.sleep(delay)
+        # Re-check the original post is still inside the reply window after waiting.
+        latest = recent_game_messages.get(key)
+        if not latest or time.monotonic() - latest[1] > GAME_REPLY_STICKER_WINDOW:
+            print(f"[{event_type}] Reply sticker skipped after delay | original={reply_to_id} | reason=window_expired")
+            return
         sticker = await get_rain_sticker_document(GAME_REPLY_STICKER_NUMBER - 1)
         sent = await user_client.send_file(chat_id, sticker, reply_to=int(message.id))
         print(
             f"[{event_type}] Reply sticker sent | chat={chat_id} "
             f"| original={reply_to_id} | replying_user_message={message.id} "
-            f"| age={age:.1f}s | sticker_message={getattr(sent, 'id', None)}"
+            f"| delay={delay:.2f}s | age={age:.1f}s | sticker_message={getattr(sent, 'id', None)}"
         )
     except Exception as e:
         print(
